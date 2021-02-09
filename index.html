@@ -23,7 +23,7 @@
     <link rel=icon href=favicons/favicon.ico>
     <link rel="stylesheet" type="text/css" href="css/brainstorm.css"/>
     <script type="text/javascript" src="js/visbrain.js"></script>
-    <script type="text/javascript" src="https://brainsatplay.com/docs/src/Game.js"></script>
+    <script type="text/javascript" src="../../src/Game.js"></script>
     <script type="text/javascript" src="js/interaction.js"></script>
     <script type="text/javascript" src="js/utils.js"></script>
     <script type="text/javascript" src="js/point-functions.js"></script>
@@ -35,7 +35,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
 </head>
 
-<body onstyle="overflow: hidden">
+<body style="overflow: hidden">
 
 <div id=app>
 
@@ -479,6 +479,8 @@
     const mvpMatrix = mat4.create();
 
     function animate() {
+
+        console.log(game.connection)
 
         requestAnimationFrame(animate)
         resize(gl.canvas);

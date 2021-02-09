@@ -1,7 +1,9 @@
 // Connection Management
 function toggleConnection(){
+
+    console.log('connection toggling',game.info,game.me)
     if (game.info.simulated == true){
-        if (undefined === game.me.username){
+        if ([undefined,"me"].includes(game.me.username)){
             toggleLoginScreen();
         } else {
         document.getElementById("connection-button").innerHTML = 'Disconnect';
@@ -53,7 +55,9 @@ async function login(type='guest'){
         formDict.guestaccess = false
     }
 
+    console.log(formDict)
     await game.connect(formDict,url).then((resDict) =>{
+        console.log('connected')
         if (resDict.result == 'OK'){
             document.getElementById('userId').innerHTML = game.me.username
             form.reset()
