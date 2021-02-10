@@ -519,11 +519,13 @@ function easeVertices() {
 
 function easeSynchrony() {
 
-    let homeSync = game.getMetric('synchrony')
+    game.getMetric('synchrony').then((homeSync) => {
     if (!isNaN(homeSync)) {
         easedSynchrony += scenes[state].ease * (homeSync - easedSynchrony);
     }
+})
 }
+
 
 
 function lagDrawMode() {

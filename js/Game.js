@@ -296,7 +296,7 @@ class Game {
             }
             return power
         } else {
-            return this.getChannelReadout(user)
+            return this.getChannelReadout()
         }
     }
 
@@ -312,14 +312,13 @@ class Game {
                 bandpower[channelInfo.index] = bci.bandpower(this.metrics.voltage.buffer[this.me.index][channelInd], this.simulation.sampleRate, band, {relative: true});
             })
 
-
             if (relative) {
                 bandpower = this.stdDev(bandpower)
             }
             return bandpower
 
         } else {
-            return this.getChannelReadout(user)
+            return this.getChannelReadout()
         }
     }
 
@@ -558,7 +557,7 @@ class Game {
                     channelData = source[channel]
                     if (userInd === 0) {
                         if (this.me.index !== undefined) {
-                            if (this.metrics[metricName].buffer.length !== 0 && this.metrics[metricName].buffer[this.me.index].length === brain.channelNames.length) {
+                            if (this.metrics[metricName].buffer.length !== 0 && this.metrics[metricName].buffer[this.me.index].length === this.usedChannelNames.length) {
                                 this.metrics[metricName].buffer[this.me.index][channelInd].splice(0, 1)
                                 this.metrics[metricName].buffer[this.me.index][channelInd].push(channelData)
                             }
