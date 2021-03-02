@@ -715,7 +715,7 @@ function brainDependencies(updateArray){
      let currDataPoints = flattenedArray.length
      let upsamplingFactor = Math.floor(pointCount/currDataPoints)
 
-    // factor must be odd
+    // // factor must be odd
      if (upsamplingFactor%2 == 0){
          upsamplingFactor -= 1;
      }
@@ -724,7 +724,9 @@ function brainDependencies(updateArray){
 
      for (i = 0; i < currDataPoints; i++){
          for (j = 0; j < upsamplingFactor; j++){
-            newArray[(i*upsamplingFactor) + j] = flattenedArray[i]
+             if (i!==0 || j !== 0){
+                newArray[(i*upsamplingFactor) + j] = flattenedArray[i]
+             }
          }
      }
       

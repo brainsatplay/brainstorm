@@ -287,7 +287,7 @@ function getChannels(pointCloud, pointCount) {
     let z_iter = ((drawArea.h)/(2*numChannels))
     let y_iter = (drawArea.w/ (channel_trigger))
 
-   // factor must be odd
+    // factor must be odd
     if (upsamplingFactor%2 === 0){
         upsamplingFactor -= 1;
     }
@@ -307,10 +307,13 @@ function getChannels(pointCloud, pointCount) {
             user++;
         }
 
-
         for (let j = 0; j < upsamplingFactor; j++){
                 pointCloud.push(...[1.0*user,y,z])
-                pointCloud.push(...[1.0*user,y+y_iter,z])
+                if (j !==0 || i!==0) {
+                    pointCloud.push(...[1.0*user,y+y_iter,z])
+                } else {
+                    pointCloud.push(...[NaN,NaN,NaN])
+                }
          }
          y += y_iter;
     }
