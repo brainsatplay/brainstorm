@@ -1,5 +1,62 @@
 /* -------------------------- Utility Functions -------------------------- */
 
+async function connectMuse(){
+    await game.bluetooth.devices['muse'].connect()
+    game.connectBluetoothDevice(brainsatplay.museClient)
+                
+}
+
+function createAuxBuffer() {
+    let buffers = Array.from({length: game.info.brains}, e => game.createBuffer(false, 1000));
+    return buffers
+}
+
+async function updateAuxBuffer(metricName) {
+    let data;
+    if (metricName === 'voltage'){
+        metricName = 'power'
+    }   
+
+    if (metricName === 'synchrony'){
+        data = await game.getMetric('synchrony')
+    } else {
+        data = await game.brains[game.info.access].get(game.me.username).getMetric(metricName,undefined,true)
+    }
+    data = data.channels;
+    data = data.filter(val => !isNaN(val))
+    data.forEach((val,channel) => {
+        auxBuffer[game.me.index][channel].shift()
+        auxBuffer[game.me.index][channel].push(val)
+    })
+}
+
+async function getChannelReadout(metricName) {
+        if (metricName === 'voltage'){
+            metricName = 'power'
+        }
+        dict = await game.getMetric(metricName,undefined,true)
+        return dict.channels
+}
+
+
+
+function flattenBrainData(metricName= 'voltage', normalize=false) {
+        let usernames = game.getUsernames()
+        let dataArray = []
+        usernames.forEach((username,user) => {
+
+            if (metricName === 'voltage'){
+                let voltages = game.getVoltage(username,normalize)
+                voltages = voltages.filter(arr => !isNaN(arr[0]))
+                dataArray.push(...voltages.flat())
+            } else {
+                dataArray.push(...auxBuffer[user].flat())
+            }
+        })
+        return dataArray
+}
+
+
 function closeNav() {
     document.getElementById("info-card").style.transform = "translateX(0px)";
     document.getElementById("navToggle").onclick = function() {openNav()};
@@ -24,9 +81,8 @@ function switchToChannels(pointCount){
     mat4.translate(viewMatrix, viewMatrix, [0, 0, cameraCurr]);
     mat4.invert(viewMatrix, viewMatrix);
 
-    let vertexHome;
     // Create signal dashboard
-    vertexHome = getChannels([],pointCount);
+    let vertexHome = getChannels([],pointCount);
     let ease = true;
     let rotation = false;
     let zoom = false;
@@ -58,7 +114,7 @@ function stateManager(forceUpdate=false){
 
     // reset displacement if leaving channels visualization
     if (scenes[prevState].shapes.includes('channels')) {
-        updateBufferData(attribs,'z_displacement',convertToWebGL(game.flatten('voltage', true), 0))
+        updateBufferData(attribs,'z_displacement',convertToWebGL(flattenBrainData('voltage',true), 0))
     }
 
     // set up variables for new state
@@ -76,7 +132,7 @@ function stateManager(forceUpdate=false){
             gl.uniform1i(uniformLocations.ambientNoiseToggle, 0);
         }
 
-        // toggle color
+        // // toggle color
         if (scenes[state].signaltype == 'voltage'){
             gl.uniform1i(uniformLocations.colorToggle, 0);
         } else {
@@ -128,7 +184,7 @@ function stateManager(forceUpdate=false){
 
     // reset z_displacement to zero when not being actively updated
     if (!['z_displacement'].includes(scenes[state].effect) && dispBuffer != undefined){
-        updateBufferData(attribs,'z_displacement',convertToWebGL(game.flatten(scenes[state].signaltype, false),0))
+        updateBufferData(attribs,'z_displacement',convertToWebGL(flattenBrainData(scenes[state].signaltype,false),0))
     }
 
 
@@ -168,9 +224,9 @@ function updateChannels(newChannels) {
         }
 
         let passedEEGCoords = [];
-        Object.keys(game.eegChannelCoordinates).forEach((name) => {
+        Object.keys(game.eegCoordinates).forEach((name) => {
             if (game.usedChannelNames.indexOf(name) != -1){
-                passedEEGCoords.push(game.eegChannelCoordinates[name])
+                passedEEGCoords.push(game.eegCoordinates[name])
             } else {
                 passedEEGCoords.push([NaN,NaN,NaN])
 
@@ -286,7 +342,7 @@ function updateUI(){
         document.getElementById('synchrony-readout').style.display = 'none'
     }
 
-    if (game.connection != undefined && game.connection.readyState === 1){
+    if (game.connection.status === true){
         if (game.info.access == 'public'){
             let prevSig = document.getElementById('signal-type').innerHTML
             if (prevSig != 'synchrony'){
@@ -520,8 +576,8 @@ function easeVertices() {
 function easeSynchrony() {
 
     game.getMetric('synchrony').then((homeSync) => {
-    if (!isNaN(homeSync)) {
-        easedSynchrony += scenes[state].ease * (homeSync - easedSynchrony);
+    if (!isNaN(homeSync.average)) {
+        easedSynchrony += scenes[state].ease * (homeSync.average - easedSynchrony);
     }
 })
 }
@@ -548,23 +604,30 @@ function updateColorsByChannel() {
         if (scenes[state].signaltype) {
             if (['projection', 'z_displacement'].includes(scenes[state].effect)) {
                 if (['projection'].includes(scenes[state].effect)) {
-                    gl.uniform1fv(uniformLocations.eeg_signal, new Float32Array(game.getChannelReadout(scenes[state].signaltype)));
-                    updateBufferData(attribs, 'z_displacement', new Array(pointCount).fill(0))
+                    updateAuxBuffer(scenes[state].signaltype)
+                    getChannelReadout(scenes[state].signaltype).then((channels) => {
+                        gl.uniform1fv(uniformLocations.eeg_signal, new Float32Array(channels));
+                        updateBufferData(attribs, 'z_displacement', new Array(pointCount).fill(0))
+                        })
                 }
                 if (['z_displacement'].includes(scenes[state].effect)) {
                     if (scenes[state].signaltype == 'voltage') {
-                        updateBufferData(attribs, 'z_displacement', convertToWebGL(game.flatten('voltage', true), 0))
+                        updateBufferData(attribs, 'z_displacement', convertToWebGL(flattenBrainData('voltage',true).map(val => val*200/game.usedChannels.length), 0))
                     } else {
-                        updateBufferData(attribs, 'z_displacement', convertToWebGL(game.flatten(scenes[state].signaltype, false), 0))
+                        updateAuxBuffer(scenes[state].signaltype)
+                        updateBufferData(attribs, 'z_displacement', convertToWebGL(flattenBrainData(scenes[state].signaltype,false), 0))
                     }
                 }
             } else {
                 updateBufferData(attribs, 'z_displacement', new Array(pointCount).fill(0))
-                gl.uniform1fv(uniformLocations.eeg_signal, new Float32Array(game.getChannelReadout(scenes[state].signaltype)));
-            }
+                getChannelReadout(scenes[state].signaltype).then(channels => {
+                    gl.uniform1fv(uniformLocations.eeg_signal, new Float32Array(channels));
+                    })            
+                }
         } else {
-            gl.uniform1fv(uniformLocations.eeg_signal, new Float32Array(game.getChannelReadout(scenes[state].signaltype)));
-            updateBufferData(attribs, 'z_displacement', new Array(pointCount).fill(0))
+            getChannelReadout(scenes[state].signaltype).then(channels => {
+                gl.uniform1fv(uniformLocations.eeg_signal, new Float32Array(channels));
+                updateBufferData(attribs, 'z_displacement', new Array(pointCount).fill(0))})
         }
 }
 
@@ -586,16 +649,11 @@ function updateSignalType(method, val){
     if (prevSig != thisSig){
         scenes[state].signaltype = thisSig;
         document.getElementById('signal-type').innerHTML = thisSig;
-        game.subscribe(thisSig,false)
-        let unsubscribeList = Object.keys(game.subscriptions)
-        if (unsubscribeList.includes(thisSig)){
-            unsubscribeList.splice(unsubscribeList.indexOf(thisSig),1)
-        }
-        unsubscribeList.forEach((metricName) =>{
-            game.unsubscribe(metricName);
-        })
         newSignalType = true;
         gl.uniform1i(uniformLocations.signaltype, signaltypes.indexOf(scenes[state].signaltype));
+
+        // Update Auxillary Buffer
+        auxBuffer = createAuxBuffer();
     }
 }
 
@@ -659,7 +717,7 @@ function brainDependencies(updateArray){
 
     // factor must be odd
      if (upsamplingFactor%2 == 0){
-         upsamplingFactor += 1;
+         upsamplingFactor -= 1;
      }
 
      let newArray = new Array(pointCount).fill(filler)

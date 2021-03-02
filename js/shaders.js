@@ -17,8 +17,8 @@ uniform mat4 matrix;
 uniform float synchrony;
 uniform float u_time;
 uniform int u_ambientNoiseToggle;
-uniform vec3 eeg_coords[65];
-uniform float eeg_signal[65];
+uniform vec3 eeg_coords[67];
+uniform float eeg_signal[67];
 uniform vec2 aspectChange;
 uniform vec2 mousePos;
 uniform int colorToggle;
@@ -32,7 +32,7 @@ vec2 currentScreen;
 
  // Set Up Synchrony Scaling
  float ss;
- float eeg_ss[65];
+ float eeg_ss[67];
  float zdelta;
 
 
@@ -120,7 +120,6 @@ void main() {
      
     // Scale Values and Cap at [-1,1]
     
-    
     // displacement
     if (signaltype != 1){
         zdelta = z_displacement*10.0;
@@ -135,8 +134,8 @@ void main() {
     }
 
     // projection
-    for (int i = 0; i < 65; i++){
-        if (signaltype == 2){
+    for (int i = 0; i < 67; i++){
+        if (signaltype != 1){
             eeg_ss[i] = eeg_signal[i]*10.0;
         } else {
            eeg_ss[i] = eeg_signal[i];
@@ -160,7 +159,7 @@ void main() {
      // Add color effects
      if (colorToggle == 1){
         if (effect == 1){
-            for (int i = 0; i < 65; i++){
+            for (int i = 0; i < 67; i++){
                 if (abs(distance(eeg_coords[i],position)) <= 60.0){
                     float factor = (eeg_ss[i])*(1.0-pow(abs(distance(eeg_coords[i],position)/75.0),2.0));
                     if (eeg_ss[i] > 0.0){
@@ -250,6 +249,5 @@ varying vec3 vColor;
 
 void main() {
     gl_FragColor = vec4(vColor,0.5);
-
 }
 `

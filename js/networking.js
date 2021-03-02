@@ -55,7 +55,6 @@ async function login(type='guest'){
         formDict.guestaccess = false
     }
 
-    console.log(formDict)
     await game.connect(formDict,url).then((resDict) =>{
         console.log('connected')
         if (resDict.result == 'OK'){

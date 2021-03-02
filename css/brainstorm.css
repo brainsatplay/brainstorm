@@ -644,6 +644,14 @@ input:focus{
     pointer-events:all;
 }
 
+#connect-muse {
+    position: fixed;
+    bottom: 50px;
+    right: 25px;
+    width: 200px;
+    max-width: 200px;
+}
+
   /* Slider */
   /* The switch - the box around the slider */
   .switch {

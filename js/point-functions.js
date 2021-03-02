@@ -274,21 +274,22 @@ function getChannels(pointCloud, pointCount) {
     if (numChannels == 0){
         numChannels = 16;
     }
+    // numChannels = 16;
     let user = -1;
     let y;
     let z;
-    let channel_trigger = game.bufferSize
-    let user_trigger = game.bufferSize*numChannels
-    let currDataPoints = game.bufferSize*numChannels*numUsers
+    let channel_trigger = game.brains[game.info.access].get(game.getUsernames()[0]).bufferSize
+    let user_trigger = channel_trigger*numChannels
+    let currDataPoints = channel_trigger*numChannels*numUsers
     let upsamplingFactor = Math.floor(pointCount/(currDataPoints)) // account for doubling (due to line drawing)
 
     let drawArea = {w: 0.8*(canvas.getBoundingClientRect().width), h: 0.8*(canvas.getBoundingClientRect().height)}
     let z_iter = ((drawArea.h)/(2*numChannels))
-    let y_iter = (drawArea.w/ (channel_trigger*upsamplingFactor))
+    let y_iter = (drawArea.w/ (channel_trigger))
 
    // factor must be odd
     if (upsamplingFactor%2 === 0){
-        upsamplingFactor += 1;
+        upsamplingFactor -= 1;
     }
 
     for (let i = 0; i < (currDataPoints-1)/2; i++) {
@@ -310,8 +311,8 @@ function getChannels(pointCloud, pointCount) {
         for (let j = 0; j < upsamplingFactor; j++){
                 pointCloud.push(...[1.0*user,y,z])
                 pointCloud.push(...[1.0*user,y+y_iter,z])
-                y += y_iter;
          }
+         y += y_iter;
     }
 
     while (pointCloud.length != pointCount * 3){
@@ -320,4 +321,69 @@ function getChannels(pointCloud, pointCount) {
 
     return pointCloud
 }
+
+
+// function getChannels(pointCloud, pointCount) {
+//     let numUsers = game.brains[game.info.access].size
+
+//     if (numUsers == 0){
+//         numUsers = 1;
+//     }
+//     let numChannels = game.usedChannels.length
+//     if (numChannels == 0){
+//         numChannels = 16;
+//     }
+//     let user = -1;
+//     let y;
+//     let z;
+//     let bufferSize =  game.brains[game.info.access].get(game.getUsernames()[0]).bufferSize
+//     let channel_trigger = bufferSize // Single-brain buffer size
+//     let user_trigger = bufferSize*numChannels
+//     let currDataPoints = bufferSize*numChannels*numUsers
+//     let upsamplingFactor = pointCount/(2*currDataPoints) // account for doubling (due to line drawing)
+    
+//     //factor must be odd
+//     if (upsamplingFactor > 0 && Math.floor(upsamplingFactor)%2 === 0){
+//         upsamplingFactor = Math.floor(upsamplingFactor) - 1;
+//     }
+
+//     let drawArea = {w: 0.8*(canvas.getBoundingClientRect().width), h: 0.8*(canvas.getBoundingClientRect().height)}
+//     let z_iter = ((drawArea.h)/(2*numChannels))
+//     let y_iter = (drawArea.w/ (channel_trigger*upsamplingFactor))
+
+//     console.log(currDataPoints)
+//     console.log(upsamplingFactor)
+
+
+//     for (let i = 0; i < ((currDataPoints-1)/2); i++) {
+
+//         // Reset channel
+//         if (i*2 % channel_trigger == 0){
+//             z += z_iter;
+//             y = -drawArea.w/4;
+//         }
+
+//         // reset user
+//         if (i*2 % user_trigger == 0){
+//             z = -(z_iter)*(numChannels/2) + z_iter/2;
+//             y = -drawArea.w/4;
+//             user++;
+//         }
+
+
+//         if (upsamplingFactor > 0){
+//         for (let j = 0; j < upsamplingFactor; j++){
+//                 pointCloud.push(...[1.0*user,y,z])
+//                 pointCloud.push(...[1.0*user,y+y_iter,z])
+//                 y += y_iter;
+//          }
+         
+//     }
+
+//     console.log(pointCloud.length)
+//     while (pointCloud.length <= pointCount * 3){
+//         pointCloud.push(NaN)
+//     }
+//     return pointCloud
+// }
 
