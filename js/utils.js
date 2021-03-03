@@ -17,17 +17,19 @@ async function updateAuxBuffer(metricName) {
         metricName = 'power'
     }   
 
+    if (game.me.index){
     if (metricName === 'synchrony'){
         data = await game.getMetric('synchrony')
     } else {
-        data = await game.brains[game.info.access].get(game.me.username).getMetric(metricName,undefined,true)
+        data = await game.getMetric(metricName,game.me.username, true,undefined)
     }
     data = data.channels;
     data = data.filter(val => !isNaN(val))
     data.forEach((val,channel) => {
-        auxBuffer[game.me.index][channel].shift()
-        auxBuffer[game.me.index][channel].push(val)
+            auxBuffer[game.me.index][channel].shift()
+            auxBuffer[game.me.index][channel].push(val)
     })
+}
 }
 
 async function getChannelReadout(metricName) {
@@ -37,8 +39,6 @@ async function getChannelReadout(metricName) {
         dict = await game.getMetric(metricName,undefined,true)
         return dict.channels
 }
-
-
 
 function flattenBrainData(metricName= 'voltage', normalize=false) {
         let usernames = game.getUsernames()

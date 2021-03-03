@@ -2,7 +2,7 @@
 function toggleConnection(){
 
     console.log('connection toggling',game.info,game.me)
-    if (game.info.simulated == true){
+    if (!game.connection.status){
         if ([undefined,"me"].includes(game.me.username)){
             toggleLoginScreen();
         } else {
