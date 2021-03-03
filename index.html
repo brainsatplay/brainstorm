@@ -26,6 +26,7 @@
     <script src="./js/brainsatplay.js"></script>
     <script src="./info-card.js" type="text/javascript" defer></script>    
     <script src="./device-card.js" type="text/javascript" defer></script>    
+    <script src="./connect-card.js" type="text/javascript" defer></script>    
     <script type="text/javascript" src="js/interaction.js"></script>
     <script type="text/javascript" src="js/utils.js"></script>
     <script type="text/javascript" src="js/point-functions.js"></script>
@@ -58,57 +59,6 @@
             <span id="canvas-message"></span>
         </div>
 
-        <div id="login-container" class="form-container">
-            <div id="login" class="form-context">
-                <h3>Sign In</h3>
-                <p id="login-message" class="small"></p>
-                <div class='flex'>
-                    <form id="login-form" action="">
-                        <div class="login-element">
-                        <input type="text" name="username" autocomplete="off" placeholder="Username"/>
-                    </div>
-                    <div class="login-element">
-                        <input type="password" name="password" autocomplete="off" placeholder="Password"/>
-                    </div>
-                    </form>
-                    <div>
-                        <button id="login-button" onclick="login('profile')">Sign In</button>
-                        <button onclick="login('guest')">Guest Access</button>
-                    </div>
-                </div>
-                <div class="login-buttons">
-                    <button onclick="toggleLoginScreen(); toggleSignUpScreen()">Sign Up</button>
-                    <button onclick="toggleLoginScreen()">Go Back</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="signup-container" class="form-container">
-            <div id="signup" class="form-context">
-                <h3>Sign Up</h3>
-                <p id="signup-message" class="small"></p>
-                <div class='flex'>
-                    <form id="signup-form" action="">
-                        <div class="login-element">
-                        <input type="text" name="username" autocomplete="off" placeholder="Username"/>
-                    </div>
-                    <div class="login-element">
-                        <input type="password" name="password" autocomplete="off" placeholder="Password"/>
-                    </div>
-                    <div class="login-element">
-                        <input type="password" name="confirm-password" autocomplete="off" placeholder="Confirm Password"/>
-                    </div>
-                    </form>
-                    <div>
-                        <button id="signup-button" onclick="signup()">Sign Up</button>
-                    </div>
-                </div>
-                <div class="login-buttons">
-                    <button onclick="toggleLoginScreen(); toggleSignUpScreen()">Go Back</button>
-                </div>
-            </div>
-        </div>
-
         <info-card name = "Brainstorm"
              author = "Brains@Play"
              website = "https://brainsatplay.com"
@@ -120,6 +70,7 @@
         ></info-card>
 
         <device-card></device-card>
+        <connect-card></connect-card>
 
         <div id="ui-elements">
 
@@ -184,36 +135,6 @@
         </div>
         </div>
 
-        <div class="info-holder-outer">
-            <h4>Connection Info</h4>
-
-            <div id="access-mode-div" class="under-header-info">
-                <p id="access-mode" class="small">Not Connected</p>
-            </div>
-
-            <div class="info-holder-inner">
-                <div id="id-params" class="params" style="display:none">
-            <h5>Username</h5>
-            <p id="userId" class="small"></p>
-          </div>
-
-          <div id="nBrains-params" class="params" style="display:none">
-            <h5>nBrains</h5>
-            <p id="nBrains" class="small"></p>
-        </div>
-        <div id="nInterfaces-params" class="params" style="display:none">
-
-        <h5>nInterfaces</h5>
-            <p id="nInterfaces" class="small"></p>
-            </div>
-            <div id="connection-toggle" class="params">
-                <button id="connection-button" class="tooltip" onclick="toggleConnection();">
-                    Connect
-                    <span class="tooltiptext"><p>Connect to Network</p><hr/><p class="small">View live brain data from Brains@Play server</p></span>
-                </button>
-            </div>
-            </div>
-        </div>
         <div class="info-holder-outer">
             <h4>Effects</h4>
             <div class="under-header-info">

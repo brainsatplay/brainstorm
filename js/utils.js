@@ -307,18 +307,6 @@ function toggleChat(){
     }
 }
 
-function toggleAccess(){
-    if (game.info.access == 'private'){
-        game.access('public')
-        document.getElementById('access-mode').innerHTML = 'Public Mode'
-    } else {
-        document.getElementById('access-mode').innerHTML = 'Private Mode'
-        game.access('private')
-        updateSignalType('signaltype', 'voltage')
-    }
-    updateUI()
-}
-
 
 function toggleUI(){
     showUI = !showUI;
@@ -660,7 +648,7 @@ function updateSignalType(method, val){
 function brainDependencies(updateArray){
 
     updateArray.forEach((updateObj) => {
-    if (updateObj.destination !== undefined && updateObj.destination.length != 0) {
+    if (updateObj.destination !== undefined && updateObj.destination.length !== 0) {
     if (updateObj.destination == 'opened'){
         state = 1;
         stateManager(true)
@@ -680,31 +668,24 @@ function brainDependencies(updateArray){
                                 <p class="small">No brains online</p></div>`)
             }
         }
-        document.getElementById('nBrains').innerHTML = `${game.info.brains}`
-        document.getElementById('nInterfaces').innerHTML = `${game.info.interfaces}`
-
     } else if (updateObj.destination == 'update'){
 
         if (state != 0){
             stateManager(true)
         }
 
-        document.getElementById('nBrains').innerHTML = `${game.info.brains}`
-
         if (game.info.brains == 0 && (game.info.access == 'public')){
             announcement('all players left the brainstorm')
         }
-        document.getElementById('nBrains').innerHTML = `${game.info.brains}`
-        }
-
-        if (game.info.access == 'private'){
-            document.getElementById('nInterfaces').innerHTML = `1`
-        } else {
-            document.getElementById('nInterfaces').innerHTML = `${game.info.interfaces}`
-        }
     } else if (updateObj.destination == 'closed'){
+        announcement(`<div>Exiting the Brainstorm
+        <p class="small">Thank you for playing!</p></div>`)
+        state = 1;
+        updateSignalType('signaltype','voltage')
+        stateManager(true)
         updateUI();
     }
+}
 })
 }
 
