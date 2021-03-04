@@ -65,10 +65,6 @@ function keyboardShortcuts(ev){
         73, // i
     ];
     if (key_events.includes(ev.keyCode)){
-        if (ev.keyCode == '73') {
-            toggleUI()
-        }
-
         if (ev.keyCode == '49'){
             state = 1
         } else if (ev.keyCode == '50'){

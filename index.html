@@ -76,7 +76,6 @@
 
         <div id='signaltypes'>
             <p id="signal-type" class="small"></p>
-            <p id="synchrony-readout"></p>
             <button id='voltage' class="tooltip" onclick="updateSignalType('element',this)">
                 <span>Voltage</span>
                 <span class="tooltiptext"><p>Voltage</p><hr/><p class="small">Raw electrical activity from the brain</p></span>
@@ -418,7 +417,6 @@
         gl.uniform1f(uniformLocations.u_time, (Date.now()-startTime)/1000);
         easeSynchrony()
         gl.uniform1f(uniformLocations.synchrony, easedSynchrony);
-        document.getElementById('synchrony-readout').innerHTML = easedSynchrony.toFixed(3);
         gl.uniform2fv(uniformLocations.aspectChange, aspectChange);
         if (mouseDistort){
         gl.uniform2fv(uniformLocations.mousePos, [(x - (canvas.width/2))/2,((canvas.height/2) - y)/2]);
@@ -430,7 +428,7 @@
         updateColorsByChannel()
         easeCamera()
         easeVertices()
-
+        
         // Draw
         if (renderLagStart == false || renderLagStart == undefined) {
             gl.drawArrays(scenes[renderState].render, 0, vertexCurr.length / 3);

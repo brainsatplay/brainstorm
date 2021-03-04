@@ -33,6 +33,12 @@ function toggleUserControls(){
         document.getElementById('controls-container').style.opacity = '0'
         document.getElementById('controls-container').style.zIndex = '-1'
     }
+
+    if (game.bluetooth.connected){
+        document.getElementById('raw-consent').style.display = 'block'
+    } else {
+        document.getElementById('raw-consent').style.display = 'none'
+    }
 }
 
 // Access
@@ -46,7 +52,12 @@ function toggleAccess(){
     }
 }
 
-  // Login
+// Access
+function toggleConsent(type){
+    game.consent(type,!game.me.consent[type])
+}
+
+// Login
 async function toggleLoginScreen(){
     brainsatplay.showLogin = !brainsatplay.showLogin;
 
@@ -90,8 +101,6 @@ function toggleSignUpScreen(){
             toggleLoginScreen();
             toggleUserControls();
             document.getElementById('username').innerHTML = game.me.username
-            document.getElementById('gamename').innerHTML = game.gameName
-
         } else {
             document.getElementById('login-message').innerHTML = resDict.msg
         }
@@ -144,6 +153,8 @@ async function signup(){
       top: 0;
       right: 0;
       width: 40vw;
+      min-width: 350px;
+      max-width: 100vw;
       height: 100vh;
       transform: translateX(100%);
       padding: 25px;
@@ -317,6 +328,10 @@ input:focus{
     flex-basis: 100%;
 }
 
+.other-buttons button{
+    flex-grow: 1;
+}
+
 #controls-container {
     display: flex;
     justify-content:center;
@@ -416,9 +431,24 @@ input:focus{
 
       <div id="controls-container">
       <div>
-        <h3>Welcome <span id="username"></span>.</h3><p>You have been connected to <span id="gamename"></span>.</p>
+        <h3>Welcome <span id="username"></span>.</h3>
+        <hr/>
+        <div id="game-consent">
+        <p>Consent to Send Game Data</p>
+        <label id="access-switch" class="switch">
+            <input type="checkbox" onchange="toggleConsent('game')">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div id="raw-consent">
+        <p>Consent to Send Raw Brain Data</p>
+        <label id="access-switch" class="switch">
+            <input type="checkbox" onchange="toggleConsent('raw')">
+            <span class="slider round"></span>
+          </label>
+        </div>
         <div id="access-mode-div">
-        <p id="access-mode" class="small">Public Mode</p>
+        <p id="access-mode">Public Mode</p>
         <label id="access-switch" class="switch">
             <input type="checkbox" onchange="toggleAccess()" checked>
             <span class="slider round"></span>

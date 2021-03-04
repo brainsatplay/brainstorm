@@ -17,18 +17,20 @@ async function updateAuxBuffer(metricName) {
         metricName = 'power'
     }   
 
-    if (game.me.index){
+    if (game.me.index !== undefined){
     if (metricName === 'synchrony'){
         data = await game.getMetric('synchrony')
     } else {
         data = await game.getMetric(metricName,game.me.username, true,undefined)
     }
     data = data.channels;
-    data = data.filter(val => !isNaN(val))
-    data.forEach((val,channel) => {
+    if (data){
+        data = data.filter(val => !isNaN(val))
+        data.forEach((val,channel) => {
             auxBuffer[game.me.index][channel].shift()
             auxBuffer[game.me.index][channel].push(val)
-    })
+        })
+    }
 }
 }
 
@@ -50,7 +52,9 @@ function flattenBrainData(metricName= 'voltage', normalize=false) {
                 voltages = voltages.filter(arr => !isNaN(arr[0]))
                 dataArray.push(...voltages.flat())
             } else {
-                dataArray.push(...auxBuffer[user].flat())
+                if (auxBuffer[user] !== undefined){
+                    dataArray.push(...auxBuffer[user].flat())
+                }
             }
         })
         return dataArray
@@ -323,12 +327,6 @@ function updateUI(){
     let dynamicSignalArray = ['delta', 'theta', 'alpha', 'beta', 'gamma']
     let opacity;
     let pointer;
-
-    if (scenes[state].name == 'Group Dynamics'){
-        document.getElementById('synchrony-readout').style.display = 'block'
-    } else {
-        document.getElementById('synchrony-readout').style.display = 'none'
-    }
 
     if (game.connection.status === true){
         if (game.info.access == 'public'){
@@ -651,6 +649,7 @@ function brainDependencies(updateArray){
     if (updateObj.destination !== undefined && updateObj.destination.length !== 0) {
     if (updateObj.destination == 'opened'){
         state = 1;
+        auxBuffer = createAuxBuffer()
         stateManager(true)
     } else if (updateObj.destination == 'error'){
         console.log('error')
@@ -672,6 +671,7 @@ function brainDependencies(updateArray){
 
         if (state != 0){
             stateManager(true)
+            auxBuffer = createAuxBuffer()
         }
 
         if (game.info.brains == 0 && (game.info.access == 'public')){
@@ -681,6 +681,7 @@ function brainDependencies(updateArray){
         announcement(`<div>Exiting the Brainstorm
         <p class="small">Thank you for playing!</p></div>`)
         state = 1;
+        auxBuffer = createAuxBuffer()
         updateSignalType('signaltype','voltage')
         stateManager(true)
         updateUI();
