@@ -8,6 +8,7 @@ function openConnectCard() {
   if (document.getElementById("connect-card")){
   document.getElementById("connect-card").style.transform = "translateX(0%)";
   document.getElementById("connect-card").style.zIndex = "1001";
+
   document.getElementById("cToggle").onclick =function() {closeConnectCard()};
   }
 }
