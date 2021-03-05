@@ -7,7 +7,7 @@ async function connectMuse(){
 }
 
 function createAuxBuffer() {
-    let buffers = Array.from({length: game.info.brains}, e => game.createBuffer(false, 1000));
+    let buffers = Array.from({length: game.brains[game.info.access].size}, e => game.createBuffer(false, 1000));
     return buffers
 }
 
@@ -26,10 +26,14 @@ async function updateAuxBuffer(metricName) {
     data = data.channels;
     if (data){
         data = data.filter(val => !isNaN(val))
+        if (auxBuffer[game.me.index]){
         data.forEach((val,channel) => {
-            auxBuffer[game.me.index][channel].shift()
-            auxBuffer[game.me.index][channel].push(val)
+                if (auxBuffer[game.me.index]){
+                    auxBuffer[game.me.index][channel].shift()
+                    auxBuffer[game.me.index][channel].push(val)
+                }
         })
+    }
     }
 }
 }
@@ -655,8 +659,8 @@ function brainDependencies(updateArray){
         console.log('error')
         announcement('WebSocket error.\n Please refresh your browser and try again.');
     } else if (updateObj.destination == 'init'){
+        auxBuffer = createAuxBuffer()
         stateManager(true)
-
         // Announce number of brains currently online
         if ((game.info.access === 'public')) {
             closeConnectCard()
