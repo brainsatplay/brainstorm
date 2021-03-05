@@ -658,11 +658,15 @@ function brainDependencies(updateArray){
         stateManager(true)
 
         // Announce number of brains currently online
-        if ((game.info.access === 'public') && game.info.simulated == false) {
-            if (updateObj.nBrains > 0) {
+        if ((game.info.access === 'public')) {
+            closeConnectCard()
+            if (updateObj.nBrains > 1) {
                 announcement(`<div>Welcome to the Brainstorm
                             <p class="small">${game.info.brains} brains online</p></div>`)
-            } else {
+            } else if (updateObj.nBrains === 1){
+                announcement(`<div>Welcome to the Brainstorm
+                <p class="small">No other brains online</p></div>`)
+            }else {
                 announcement(`<div>Welcome to the Brainstorm
                                 <p class="small">No brains online</p></div>`)
             }
