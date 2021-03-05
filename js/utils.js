@@ -17,7 +17,6 @@ async function updateAuxBuffer(metricName) {
         metricName = 'power'
     }   
 
-    if (game.me.index !== undefined){
     if (metricName === 'synchrony'){
         data = await game.getMetric('synchrony')
     } else {
@@ -26,16 +25,15 @@ async function updateAuxBuffer(metricName) {
     data = data.channels;
     if (data){
         data = data.filter(val => !isNaN(val))
-        if (auxBuffer[game.me.index]){
+        if (auxBuffer[0]){
         data.forEach((val,channel) => {
-                if (auxBuffer[game.me.index]){
-                    auxBuffer[game.me.index][channel].shift()
-                    auxBuffer[game.me.index][channel].push(val)
-                }
+            if (auxBuffer[0]){
+                auxBuffer[0][channel].shift()
+                auxBuffer[0][channel].push(val)
+            }
         })
     }
     }
-}
 }
 
 async function getChannelReadout(metricName) {
